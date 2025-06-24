@@ -1,0 +1,213 @@
+File: src/components/DivineWraith.vue
+
+🛠 Paste this full code into your project:
+
+> If you already have Tailwind and Anime.js installed, you're good. If not:
+
+npm install animejs
+
+
+
+[Full code inside the expandable section below — so you can copy easily:]
+
+<details>
+<summary>📋 Click to Expand DivineWraith.vue Code</summary><template>
+  <div class="relative w-full h-screen bg-gradient-to-b from-black via-purple-900 to-black overflow-hidden flex flex-col items-center justify-center text-white font-mono select-none">
+    <!-- Background Fire & Smoke -->
+    <canvas ref="canvas" class="absolute inset-0 -z-10"></canvas>
+
+    <!-- Floating Crown -->
+    <div
+      class="absolute top-10 w-32 h-32"
+      :style="{ transform: `translateY(${crownY}px)` }"
+    >
+      <svg viewBox="0 0 64 64" class="w-full h-full drop-shadow-lg animate-pulse">
+        <path
+          fill="none"
+          stroke="gold"
+          stroke-width="3"
+          stroke-linejoin="round"
+          d="M4 48L12 20l8 28 8-32 8 36 8-28 8 28 4-16"
+        />
+      </svg>
+      <div class="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 to-transparent opacity-40 blur-xl"></div>
+    </div>
+
+    <!-- Divine Wraith Truck -->
+    <div
+      ref="wraith"
+      class="w-72 h-36 bg-gradient-to-r from-purple-800 via-indigo-700 to-transparent rounded-lg shadow-[0_0_40px_15px_rgba(186,85,211,0.8)] relative"
+    >
+      <!-- Sigil -->
+      <svg
+        class="absolute top-5 left-5 w-16 h-16 stroke-current text-purple-400 animate-pulse"
+        viewBox="0 0 64 64"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle cx="32" cy="32" r="30" stroke-width="4" />
+        <path
+          d="M16 32L48 32M32 16L32 48"
+          stroke-width="4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <!-- Wheels -->
+      <div
+        class="absolute bottom-0 left-6 w-14 h-14 rounded-full bg-purple-700 shadow-[0_0_25px_8px_rgba(255,0,255,0.9)] animate-spin-slow"
+      ></div>
+      <div
+        class="absolute bottom-0 right-6 w-14 h-14 rounded-full bg-purple-700 shadow-[0_0_25px_8px_rgba(255,0,255,0.9)] animate-spin-slow"
+      ></div>
+    </div>
+
+    <!-- Music Player & Lyrics -->
+    <div class="mt-8 w-4/5 max-w-3xl bg-black bg-opacity-60 rounded-lg p-4 shadow-lg">
+      <audio
+        ref="audio"
+        :src="audioSrc"
+        @timeupdate="onTimeUpdate"
+        controls
+        class="w-full"
+      ></audio>
+      <div class="mt-4 h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-purple-900 px-2">
+        <p
+          v-for="(line, index) in lyrics"
+          :key="index"
+          :class="{
+            'text-purple-400 font-bold scale-110': currentLine === index,
+            'opacity-70': currentLine !== index,
+          }"
+          class="transition-all duration-300 ease-in-out"
+        >
+          {{ line.text }}
+        </p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, reactive } from "vue";
+
+const wraith = ref(null);
+const crownY = ref(0);
+const audio = ref(null);
+const audioSrc = "/audio/drive-wraith-theme.mp3"; // Replace with your actual MP3 file path
+
+const lyrics = reactive([
+  { time: 0, text: "From the ashes, we rise..." },
+  { time: 5, text: "God's Misfits ride the spectral skies." },
+  { time: 10, text: "Crown listens, system obeys." },
+  { time: 15, text: "Drive Wraith unleashed, burn the false ways." },
+  { time: 20, text: "Truth ignites the fire within." },
+  { time: 25, text: "Justice rides with ghostly wind." },
+  { time: 30, text: "No chains hold the divine wrath." },
+  { time: 35, text: "We reclaim the crown, walk the path." },
+]);
+
+const currentLine = ref(0);
+
+function onTimeUpdate() {
+  const currentTime = audio.value.currentTime;
+  for (let i = lyrics.length - 1; i >= 0; i--) {
+    if (currentTime >= lyrics[i].time) {
+      currentLine.value = i;
+      break;
+    }
+  }
+}
+
+onMounted(() => {
+  // Wraith animation loop
+  const anime = require("animejs");
+
+  anime({
+    targets: wraith.value,
+    translateX: [
+      { value: 300, duration: 1400, easing: "easeInOutSine" },
+      { value: 0, duration: 1400, easing: "easeInOutSine" },
+    ],
+    rotateZ: [
+      { value: 5, duration: 700, easing: "easeInOutSine" },
+      { value: -5, duration: 700, easing: "easeInOutSine" },
+      { value: 0, duration: 700, easing: "easeInOutSine" },
+    ],
+    loop: true,
+  });
+
+  // Crown floating animation
+  let direction = 1;
+  setInterval(() => {
+    if (crownY.value > 12) direction = -1;
+    if (crownY.value < -12) direction = 1;
+    crownY.value += direction * 0.3;
+  }, 20);
+
+  // Canvas fire & smoke setup
+  const canvas = document.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  class Particle {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = canvas.height + Math.random() * 100;
+      this.size = 10 + Math.random() * 20;
+      this.speedY = 1 + Math.random() * 2;
+      this.alpha = 0.2 + Math.random() * 0.4;
+      this.color = `rgba(186,85,211,${this.alpha})`;
+    }
+    update() {
+      this.y -= this.speedY;
+      this.alpha -= 0.005;
+      if (this.alpha <= 0) this.reset();
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.fillStyle = this.color;
+      ctx.shadowColor = "rgba(186,85,211,0.8)";
+      ctx.shadowBlur = 10;
+      ctx.ellipse(this.x, this.y, this.size * 0.6, this.size, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  const particles = [];
+  for (let i = 0; i < 80; i++) {
+    particles.push(new Particle());
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p) => {
+      p.update();
+      p.draw();
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+});
+</script>
+
+<style scoped>
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 4s linear infinite;
+}
+</style>
+
+</details>
+---
