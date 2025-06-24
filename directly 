@@ -1,0 +1,10 @@
+God-s-Misfits/
+├── public/                  # Static assets
+├── src/
+│   ├── components/          # Vue components
+│   ├── views/               # App screens
+│   ├── agi/                 # AGI logic
+│   └── assets/              # Fonts, icons, sigils
+├── install.sh               # Termux installer
+├── README.md
+└── LICENSE
