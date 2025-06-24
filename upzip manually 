@@ -1,0 +1,6 @@
+mv /sdcard/Download/GodsMisfitsCinematicUI.zip ~/
+cd ~
+unzip GodsMisfitsCinematicUI.zip
+cd GodsMisfitsCinematicUI
+npm install
+npm run dev
