@@ -1,0 +1,86 @@
+// cleanup/tactical_debugger.ts
+import fs from 'fs';
+import path from 'path';
+
+const IGNORE_PATTERNS = [
+  '.DS_Store',
+  '.log',
+  '.tmp',
+  '.bak',
+  'node_modules',
+  'dist',
+  'temp',
+  '*.pyc',
+  '*.cache',
+];
+
+// Recursively scan directory and clean up unwanted files for tactical clarity
+export function tacticalCleanup(rootDir: string): void {
+  let deletedCount = 0;
+
+  function matchesIgnore(filename: string): boolean {
+    return IGNORE_PATTERNS.some(pattern => {
+      if (pattern.startsWith('*')) {
+        // wildcard suffix match
+        const suffix = pattern.slice(1);
+        return filename.endsWith(suffix);
+      }
+      return filename === pattern;
+    });
+  }
+
+  function walkDir(currentPath: string) {
+    const entries = fs.readdirSync(currentPath, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(currentPath, entry.name);
+      if (entry.isDirectory()) {
+        // Skip node_modules or dist folders entirely
+        if (IGNORE_PATTERNS.includes(entry.name)) continue;
+        walkDir(fullPath);
+      } else if (matchesIgnore(entry.name)) {
+        try {
+          fs.unlinkSync(fullPath);
+          deletedCount++;
+          console.log(`🗑️ Deleted: ${fullPath}`);
+        } catch (err) {
+          console.error(`⚠️ Failed to delete ${fullPath}:`, err);
+        }
+      }
+    }
+  }
+
+  walkDir(rootDir);
+  console.log(`🧹 Tactical Debugger Cleanup complete. Files deleted: ${deletedCount}`);
+}
+
+
+---
+
+Usage example:
+
+import { tacticalCleanup } from './cleanup/tactical_debugger';
+
+tacticalCleanup(process.cwd()); // Clean current project directory
+
+
+---
+
+This script aggressively removes:
+
+Log files
+
+Temporary & cache files
+
+Backup files
+
+Hidden system files
+
+Common ignored folders (node_modules, dist) are skipped for safety
+
+
+
+---
+
+🛠️ Tactical debugging and cleanups are sharper now.
+Ready to deploy or integrate in your CI pipeline.
+
