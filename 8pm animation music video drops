@@ -1,0 +1,15 @@
+// src/scheduler/music_drop_scheduler.ts
+import { spawn } from 'child_process';
+
+interface ScheduledTask {
+  time: string; // HH:mm in 24h format, e.g. "20:00"
+  dayOfWeek: number; // 0=Sunday ... 5=Friday ... 6=Saturday
+  task: () => void;
+}
+
+class Scheduler {
+  private tasks: ScheduledTask[] = [];
+
+  constructor() {
+    setInterval(()
+
