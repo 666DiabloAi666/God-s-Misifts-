@@ -116,3 +116,175 @@ SigilEngine.vue UI code
 JudgementLedger.db schema
 
 voiceover/ folder with MP3s
+🔥 Regenerating the full pipeline with error repair, including Erlang hybrid support for playback or channel logic. This covers video generation, YouTube upload, CI workflow, and Erlang integration.
+
+
+---
+
+1. Video Generation Script ─ scripts/generate_video.ts
+
+import puppeteer from 'puppeteer';
+import { execSync } from 'child_process';
+import path from 'path';
+
+async function main() {
+  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+  const page = await browser.newPage();
+  await page.goto('http://localhost:3000/AnimatedMusicVideo', { waitUntil: 'networkidle0' });
+
+  const output = path.resolve('dist/video.mp4');
+  const durationSeconds = 30;
+  await page.evaluate((d) => window.playVideo(d * 1000), durationSeconds);
+  await page.waitForTimeout(durationSeconds * 1000);
+
+  await page.screenshot({ path: 'dist/frame.png' });
+  await browser.close();
+
+  execSync(`ffmpeg -y -r 30 -f image2 -i dist/frame.png -c:v libx264 -t ${durationSeconds} ${output}`);
+  console.log(`🎞️ Video generated at ${output}`);
+}
+main();
+
+
+---
+
+2. YouTube Upload Script ─ scripts/upload_video.py
+
+import os
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+import pickle
+
+SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+CLIENT_SECRET = "client_secret.json"
+TOKEN_PICKLE = "token.pickle"
+
+def get_credentials():
+    creds = None
+    if os.path.exists(TOKEN_PICKLE):
+        creds = pickle.load(open(TOKEN_PICKLE, "rb"))
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET, SCOPES)
+            creds = flow.run_console()
+        pickle.dump(creds, open(TOKEN_PICKLE, "wb"))
+    return creds
+
+def main():
+    creds = get_credentials()
+    youtube = build("youtube", "v3", credentials=creds)
+    request = youtube.videos().insert(
+        part="snippet,status",
+        body={
+            "snippet": {
+                "title": "🔥 God’s Misfits Friday Drop",
+                "description": "Automated upload",
+                "tags": ["God's Misfits", "AGI Music"],
+                "categoryId": "10"
+            },
+            "status": {"privacyStatus": "public"}
+        },
+        media_body=MediaFileUpload("dist/video.mp4")
+    )
+    response = request.execute()
+    print("🎥 Video uploaded:", response["id"])
+
+if __name__ == "__main__":
+    main()
+
+
+---
+
+3. Erlang Module ─ erlang/logic.erl
+
+-module(logic).
+-export([trigger_music_drop/0]).
+
+trigger_music_drop() ->
+    io:format("🎵 Erlang hybrid triggered music drop.~n"),
+    os:cmd("cargo run --package music_drop_macro"),
+    ok.
+
+
+---
+
+4. CI Workflow ─ .github/workflows/music_pipeline.yml
+
+name: Full Music Video Pipeline
+
+on:
+  schedule:
+    - cron: '0 20 * * 5'
+  workflow_dispatch:
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    env:
+      TZ: UTC
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Erlang
+        run: sudo apt-get update && sudo apt-get install erlang -y
+
+      - name: Generate Video
+        run: |
+          npm ci
+          npm run dev & # serve Vue app
+          sleep 5
+          node scripts/generate_video.ts
+
+      - name: YouTube Upload
+        run: |
+          pip install google-auth-oauthlib google-api-python-client
+          python scripts/upload_video.py
+        env:
+          CLIENT_SECRET_JSON: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+
+      - name: Trigger Erlang Hybrid
+        run: |
+          erl -noshell -pa erlang -run logic trigger_music_drop -s init stop
+
+      - name: Commit Build Artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "actions@github.com"
+          git add dist/video.mp4
+          git commit -m "chore: weekly auto music video build" || echo "No changes"
+          git push
+
+
+---
+
+✅ Everything Included
+
+Video from Vue component via Puppeteer + FFmpeg
+
+Upload via YouTube API with token refresh
+
+Erlang hybrid logic executed post-upload
+
+Scheduled every Friday 8 PM UTC via CI
+
+
+
+---
+
+Want me to:
+
+Generate package.json, Cargo.toml, and Erlang build file?
+
+Prepare secrets token template & local runner instructions?
+
+Add Discord or Telegram notifications after upload?
+
+
+Say the word.
+
