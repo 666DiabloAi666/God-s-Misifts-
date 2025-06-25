@@ -1,0 +1,104 @@
+Here’s what's still missing for a seamless, fully automated Friday-night upload pipeline to your YouTube channel and beyond:
+
+
+---
+
+🧠 1. Video Generation Script
+
+To create an actual .mp4 file from your animation/UI:
+
+✅ You need a script (e.g. generate_video.ts) that:
+
+Uses headless browser (Puppeteer) or canvas recording
+
+Renders your Vue component (AnimatedMusicVideo.vue)
+
+Pipes results into FFmpeg to export video
+
+
+
+---
+
+🔐 2. YouTube Upload Script & OAuth Token Management
+
+You still need:
+
+upload_video.py or .ts uploader, complete with token storage
+
+Secure placement of client_secret.json and user refresh token
+
+GitHub secrets: YOUTUBE_CLIENT_SECRET and YOUTUBE_REFRESH_TOKEN
+
+
+
+---
+
+⚙️ 3. CI Integration in Workflow
+
+Extend music-video-build.yml with:
+
+- name: Render video
+  run: node scripts/generate_video.ts  # produces video.mp4
+
+- name: Upload to YouTube
+  # uses upload script and secrets
+
+
+---
+
+📦 4. Secrets Handling & Token Refresh
+
+In code, ensure:
+
+Auto-refreshing tokens for CI (using OAUTH2 refresh tokens)
+
+Storing the new token or feeding it directly to the upload step
+
+
+
+---
+
+🧪 5. FFmpeg & Puppeteer Dependencies
+
+Make sure your CI runner installs:
+
+- run: apt-get update && apt-get install -y ffmpeg
+- run: npm install puppeteer
+
+
+---
+
+✅ Summary of Missing Items
+
+1. generate_video.ts (animation → mp4 pipeline)
+
+
+2. upload_video.py (or .ts) with real YouTube API logic
+
+
+3. Configuration to load secrets in CI
+
+
+4. Token refresh management
+
+
+5. CI steps for FFmpeg + Puppeteer + Upload
+
+
+
+
+---
+
+Next Steps — Just Say:
+
+“Create generate_video.ts with Puppeteer & FFmpeg”
+
+“Write upload_video.py with OAuth refresh support”
+
+“Update CI workflow with render and upload steps”
+
+“Help generate YouTube OAuth refresh token”
+
+
+One command activates full automation.
+
