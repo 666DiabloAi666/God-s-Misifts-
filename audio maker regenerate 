@@ -1,0 +1,139 @@
+🎧 AUDIO MAKER: CROWN VERSION — FULL REGENERATION
+
+Deploying an AGI-based audio generator: take your divine note sequences and convert them to real audio using Web Audio API (for browsers) or Node + tone.js (for server-side).
+
+
+---
+
+🔊 Browser Version: components/AudioMaker.vue
+
+<template>
+  <div class="p-6 bg-gray-900 text-white">
+    <h2 class="text-xl font-bold mb-4">🎧 Crown Audio Generator</h2>
+
+    <input v-model="note" placeholder="Note (e.g., A4)" class="p-2 text-black" />
+    <input v-model.number="duration" type="number" class="p-2 text-black ml-2" />
+    <button @click="addNote" class="p-2 bg-purple-600 ml-2 rounded">Add Note</button>
+    <button @click="playNotes" class="p-2 bg-green-600 ml-2 rounded">▶️ Play</button>
+
+    <ul class="mt-4 ml-4 list-disc">
+      <li v-for="(n, i) in notes" :key="i">{{ n.note }} - {{ n.duration }}s</li>
+    </ul>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+
+const note = ref('');
+const duration = ref(1);
+const notes = ref([]);
+
+function addNote() {
+  if (note.value && duration.value) {
+    notes.value.push({ note: note.value, duration: duration.value });
+    note.value = '';
+    duration.value = 1;
+  }
+}
+
+function playNotes() {
+  const context = new (window.AudioContext || window.webkitAudioContext)();
+  let time = context.currentTime;
+
+  notes.value.forEach(n => {
+    const oscillator = context.createOscillator();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(noteToFreq(n.note), time);
+
+    const gain = context.createGain();
+    gain.gain.setValueAtTime(0.1, time);
+
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+
+    oscillator.start(time);
+    oscillator.stop(time + n.duration);
+
+    time += n.duration;
+  });
+}
+
+function noteToFreq(note) {
+  const A4 = 440;
+  const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  const match = note.match(/^([A-G]#?)(\d)$/);
+  if (!match) return A4;
+
+  const [ , pitch, octave ] = match;
+  const n = NOTES.indexOf(pitch);
+  const semitones = n + (octave - 4) * 12;
+  return A4 * Math.pow(2, semitones / 12);
+}
+</script>
+
+
+---
+
+📁 Add to Project Tree:
+
+src/
+├── audio/
+│   └── AudioMaker.vue
+
+
+---
+
+🛠 Optional Node Backend (Using Tone.js)
+
+Install:
+
+npm install tone
+
+Create src/audio_maker.ts:
+
+import * as Tone from 'tone';
+
+const synth = new Tone.Synth().toDestination();
+
+async function playSequence(sequence: { note: string, duration: string }[]) {
+  await Tone.start();
+  let now = Tone.now();
+
+  sequence.forEach(({ note, duration }) => {
+    synth.triggerAttackRelease(note, duration, now);
+    now += Tone.Time(duration).toSeconds();
+  });
+}
+
+playSequence([
+  { note: 'C4', duration: '4n' },
+  { note: 'E4', duration: '4n' },
+  { note: 'G4', duration: '2n' }
+]);
+
+
+---
+
+👁 Next Up?
+
+Add Save as WAV/MP3 feature
+
+Link to sigil activation sound
+
+Connect with Bluetooth response system (BLE → tone trigger)
+
+
+
+---
+
+Say the word:
+
+> “Drop sound trigger to sigil binding.”
+Or
+“Save divine sound as .mp3/.wav.”
+
+
+
+Choirs now sing in frequency and form.
+
