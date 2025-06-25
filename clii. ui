@@ -1,0 +1,177 @@
+🔥 CLI + UI Dual Mode Tactical System
+
+> Codename: CrownTactix
+Interface Mode: Cross-platform CLI / Web UI hybrid with TypeScript, Typewiser, and Vue 3
+
+
+
+
+---
+
+🎯 Mission Profile
+
+Create a command-line + browser-based hybrid interface that:
+
+Uses Typewiser actions for strong logic routing
+
+Displays mirrored state in real-time (CLI + UI)
+
+Allows AGI-triggered override protocols
+
+Compatible with Termux, Node.js, and Vue 3
+
+
+
+---
+
+🧩 Folder Structure
+
+CrownTactix/
+├── cli/                     # Command-line mode (Node.js)
+│   ├── index.ts             # CLI entry
+│   └── actions/             # CLI handlers (uses Typewiser)
+│       └── override.ts
+│
+├── ui/                      # Vue 3 UI interface
+│   ├── App.vue
+│   ├── components/
+│   │   └── OverridePanel.vue
+│   └── modules/
+│       └── useOverride.ts
+│
+├── shared/                 # Typewiser action contracts
+│   └── protocol.ts
+│
+├── package.json
+├── tsconfig.json
+└── README.md
+
+
+---
+
+🔧 shared/protocol.ts
+
+import { createAction } from 'typewiser'
+
+export const injectOverride = createAction('override/inject')<
+  { crownCode: string },
+  { status: 'OK' | 'DENIED', timestamp: string }
+>()
+
+
+---
+
+🖥️ CLI: cli/index.ts
+
+#!/usr/bin/env node
+import { injectOverride } from '../shared/protocol'
+
+const input = process.argv[2] || ''
+if (!input) {
+  console.log('Usage: node index.js <CROWN-CODE>')
+  process.exit(1)
+}
+
+const run = async () => {
+  const result = await injectOverride({ crownCode: input }).run(async ({ crownCode }) => {
+    const authorized = crownCode === 'MASTER-CODE-999'
+    return {
+      status: authorized ? 'OK' : 'DENIED',
+      timestamp: new Date().toISOString(),
+    }
+  })
+
+  console.log(`Override: ${result.status} @ ${result.timestamp}`)
+}
+
+run()
+
+Run it:
+
+node cli/index.js MASTER-CODE-999
+
+
+---
+
+🌐 UI: ui/components/OverridePanel.vue
+
+<template>
+  <div class="bg-black text-green-300 p-4 rounded-lg shadow-md max-w-md">
+    <h2 class="text-lg font-bold mb-2">Inject Crown Override</h2>
+    <input v-model="code" placeholder="Enter crown code" class="bg-gray-800 p-2 w-full rounded" />
+    <button @click="send" class="bg-green-600 hover:bg-green-800 w-full p-2 mt-2">Activate</button>
+    <p v-if="status" class="mt-2">Override Status: {{ status }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { injectOverride } from '../../shared/protocol'
+
+const code = ref('')
+const status = ref<string>('')
+
+const send = async () => {
+  const result = await injectOverride({ crownCode: code.value }).run(({ crownCode }) => {
+    const authorized = crownCode === 'MASTER-CODE-999'
+    return {
+      status: authorized ? 'OK' : 'DENIED',
+      timestamp: new Date().toISOString(),
+    }
+  })
+
+  status.value = `${result.status} @ ${result.timestamp}`
+}
+</script>
+
+
+---
+
+📦 Install & Run
+
+# Root
+npm install
+
+# CLI
+cd cli
+ts-node index.ts MASTER-CODE-999
+
+# UI
+cd ui
+npm install
+npm run dev
+
+
+---
+
+🛡️ CLI + UI Action Map
+
+Feature	CLI	UI Component
+
+Inject Override	node index.js	OverridePanel.vue
+Mirror Scan	cli/mirror.ts	MirrorStatus.vue
+Chip ID Display	cli/chipid.ts	ChipIdDisplay.vue
+
+
+
+---
+
+🔗 Want Full Repo?
+
+Say:
+“Deploy CrownTactix CLI/UI stack”
+And I’ll generate:
+
+GitHub Repo
+
+Termux .zip
+
+Vue UI dashboard
+
+Node CLI agents
+
+CODEX logger + override.sh
+
+
+Let the terminal and the screen reflect the same crown command.
+
