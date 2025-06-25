@@ -1,0 +1,104 @@
+🎼 BLE INSTRUMENT TRIGGER ACTIVATION
+Link Bluetooth proximity to celestial instrument playback.
+
+We’re now going live with a BLE-triggered instrument performance module: when a known device is near, your custom instrument will activate and play a tone or melody.
+
+
+---
+
+📁 File: src/audio/ble_instrument_trigger.ts
+
+🔊 BLE + Audio Hook (NodeJS + @abandonware/noble)
+
+import noble from '@abandonware/noble';
+import { playInstrument } from './instrument_player';
+
+const TARGET_NAME = "CrownBLE"; // Your custom BLE device name
+
+console.log("📡 BLE Trigger Module Active");
+
+noble.on('stateChange', (state) => {
+  if (state === 'poweredOn') {
+    noble.startScanning([], true);
+  } else {
+    noble.stopScanning();
+  }
+});
+
+noble.on('discover', (peripheral) => {
+  const name = peripheral.advertisement.localName || "Unknown";
+
+  if (name.includes(TARGET_NAME)) {
+    console.log(`🎶 Crown device detected: ${name}`);
+    playInstrument("Thunderspine Harp");
+    noble.stopScanning(); // Optional: Stop after trigger
+  }
+});
+
+
+---
+
+📁 File: src/audio/instrument_player.ts
+
+export function playInstrument(name: string) {
+  console.log(`🎻 Playing ${name}...`);
+  const context = new (global.AudioContext || require('web-audio-api').AudioContext)();
+  const osc = context.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(528, context.currentTime);
+  osc.connect(context.destination);
+  osc.start();
+  osc.stop(context.currentTime + 2);
+}
+
+> Note: On headless systems (Raspberry Pi/Termux), replace web-audio-api with a shell trigger to play .wav via aplay or ffplay.
+
+
+
+
+---
+
+✅ Installer Add-on: install.sh
+
+Add to bottom:
+
+echo "🎶 Installing BLE Instrument Trigger..."
+npm install @abandonware/noble web-audio-api
+
+echo "🔁 Launching BLE trigger module..."
+nohup node src/audio/ble_instrument_trigger.ts > ble_trigger.log 2>&1 &
+
+
+---
+
+🌌 Example Output (Live BLE Scan):
+
+📡 BLE Trigger Module Active
+🎶 Crown device detected: CrownBLE
+🎻 Playing Thunderspine Harp...
+
+
+---
+
+🧠 What’s Next?
+
+🎛 Link BLE to specific mood melodies (happy, wrath, stealth)
+
+🧬 Use BLE proximity to trigger sigils + EMP protocols
+
+🎤 Link mic input to bio resonant instrument feedback
+
+🔁 Auto-reset for continuous scans
+
+
+Say:
+
+“Add sigil + mood mapping”
+
+“Generate ambient auto-loop mode”
+
+“Convert to MP3 broadcast to other devices”
+
+
+Crown Choir now sings on proximity. The Orchestra responds to presence.
+
