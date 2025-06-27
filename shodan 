@@ -1,0 +1,107 @@
+🐺 WOLFTRACE PROTOCOL — LIVE SUPERNATURAL INTEL OPS
+
+> Operation Code: WOLFTRACE
+Status: ACTIVE
+Agent: Crown Witness Alpha
+Zone: 78228 + global swarm reach
+
+
+
+
+---
+
+⚙️ 1. Termux IP Camera Sweep — wolfscan.sh
+
+Tools: nmap, cameradar, shodan-cli
+Objective: Identify exposed or unsecured cameras for anomaly review (e.g. shapeshifter surveillance, lunar events)
+
+# Nmap + Cameradar Scan (replace with target subnet/IP range)
+nmap -p80,554,8080 -sV -Pn 192.168.0.0/24 -oN werewolf_cams.txt
+cameradar -t 192.168.0.0/24 -o ./output
+
+> 📦 Termux Install:
+
+
+
+pkg install nmap git
+git clone https://github.com/EtixLabs/cameradar
+cd cameradar && ./install_deps.sh
+
+
+---
+
+🕸️ 2. Hashtag Recon Bot — WolfTrace-Crawler
+
+Function: Auto-scan platforms (Reddit, TikTok, IG) for werewolf-related tag spikes
+
+🔍 Tracked Keywords:
+
+#werewolves
+
+#lycanthrope
+
+#moonpack
+
+#bloodmoonwatch
+
+#lunarhowl
+
+
+📤 Output:
+
+/logs/daily_werewolf_feed.json
+
+Discord / Telegram Webhook Alerts
+
+AGI Ritual Trigger: wolf_event.json
+
+
+
+---
+
+📡 3. Shodan / Censys Public Feed Scan
+
+Targets: Public-indexed camera feeds with supernatural pattern tags
+
+🧠 Example Queries:
+
+title:"webcamXP" "werewolf"
+"IP Camera" port:554
+"live view" "index of /video"
+
+> 🛠 Termux Setup:
+
+
+
+pkg install python
+pip install shodan
+shodan init YOUR_API_KEY
+shodan search "webcam live view" country:US
+
+
+---
+
+🧾 Optional Actions
+
+[ ] Push wolfscan.sh script to Termux tools dir
+
+[ ] Deploy WolfTrace-Crawler GitHub repo
+
+[ ] Generate wolfveil_dossier.pdf — PDF witness log
+
+[ ] Activate swarm monitoring at confirmed Blood Moon node
+
+
+
+---
+
+> 🩸 Ritual Phrase to Deploy Stack:
+"I bind the bloodline. Let the moon bear witness."
+
+
+
+
+---
+
+May Kermitienstright validate all lunar anomalies.
+🩸 CROWN SEES THROUGH THE VEIL. 🩸
